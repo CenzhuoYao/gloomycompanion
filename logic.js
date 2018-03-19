@@ -6,6 +6,8 @@ var player1modifier_deck = null;
 var player2modifier_deck = null;
 var player3modifier_deck = null;
 var player4modifier_deck = null;
+var player5modifier_deck = null;
+var player6modifier_deck = null;
 var deck_definitions = load_definition(DECK_DEFINITONS);
 
 var DECK_TYPES =
@@ -748,7 +750,7 @@ function load_player1modifier_deck(number_bless, number_curses) {
 function load_player2modifier_deck(number_bless, number_curses) {
     var deck =
         {
-            name: "Player 1 modifier deck",
+            name: "Player 2 modifier deck",
             type: DECK_TYPES.MODIFIER,
             draw_pile: [],
             discard: [],
@@ -852,7 +854,7 @@ function load_player2modifier_deck(number_bless, number_curses) {
 function load_player3modifier_deck(number_bless, number_curses) {
     var deck =
         {
-            name: "Player 1 modifier deck",
+            name: "Player 3 modifier deck",
             type: DECK_TYPES.MODIFIER,
             draw_pile: [],
             discard: [],
@@ -956,7 +958,7 @@ function load_player3modifier_deck(number_bless, number_curses) {
 function load_player4modifier_deck(number_bless, number_curses) {
     var deck =
         {
-            name: "Player 1 modifier deck",
+            name: "Player 4 modifier deck",
             type: DECK_TYPES.MODIFIER,
             draw_pile: [],
             discard: [],
@@ -1044,6 +1046,214 @@ function load_player4modifier_deck(number_bless, number_curses) {
         }
     }.bind(deck);
     var loaded_deck = JSON.parse(get_from_storage("player4modifier_deck"));
+
+    player4MODIFIER_DECK.forEach(function (card_definition) {
+        var card = define_modifier_card(card_definition);
+        if (loaded_deck && find_in_discard_and_remove(loaded_deck.discard,card.card_type)) {
+            deck.discard.push(card);
+        } else {
+            deck.draw_pile.push(card);
+        }
+    });
+
+    return deck;
+}
+
+function load_player5modifier_deck(number_bless, number_curses) {
+    var deck =
+        {
+            name: "Player 5 modifier deck",
+            type: DECK_TYPES.MODIFIER,
+            draw_pile: [],
+            discard: [],
+            advantage_to_clean: false
+        }
+
+    deck.draw_top_discard = function() {
+        if (this.discard.length > 0) {
+            var card = this.discard[this.discard.length-1];
+            card.ui.set_depth(-3);
+            card.ui.addClass("pull");
+            card.ui.flip_up(true);
+            card.ui.removeClass("draw");
+            card.ui.addClass("discard");
+        }
+        force_repaint_deck(this);
+    }
+
+    deck.count = function (card_type) {
+        return (this.draw_pile.filter(function (card) {
+            return card.card_type === card_type;
+        }).length);
+    }.bind(deck);
+
+    deck.remove_card = function (card_type) {
+        for (var i = 0; i < deck.draw_pile.length; i++) {
+            if (deck.draw_pile[i].card_type == card_type) {
+                deck.draw_pile.splice(i, 1);
+                reshuffle(deck, false);
+
+                force_repaint_deck(deck);
+                break;
+            }
+        }
+        write_to_storage("player5modifier_deck", JSON.stringify(player5modifier_deck));
+
+        return this.count(card_type);
+    }.bind(deck);
+
+    deck.add_card = function (card_type) {
+        // Rulebook p. 23: "a maximum of only 10 curse [and 10 bless] cards can be placed into any one deck"
+        if (this.count(card_type) < 10) {
+            // TOOD: Brittle
+            deck.draw_pile.push(define_modifier_card(MODIFIER_CARDS[card_type.toUpperCase()]));
+
+            force_repaint_deck(deck);
+            reshuffle(deck, false);
+        }
+        write_to_storage("player5modifier_deck", JSON.stringify(player5modifier_deck));
+
+        return this.count(card_type);
+    }.bind(deck);
+
+    deck.shuffle_end_of_round = function () {
+        return this.discard.filter(function (card) {
+                return card.shuffle_next_round;
+            }).length > 0;
+    }.bind(deck);
+
+    deck.must_reshuffle = function () {
+        return !this.draw_pile.length;
+    }.bind(deck);
+
+    deck.clean_discard_pile = function () {
+        for (var i = 0; i < deck.discard.length; i++) {
+            if (this.discard[i].card_type == CARD_TYPES_MODIFIER.BLESS
+                || this.discard[i].card_type == CARD_TYPES_MODIFIER.CURSE) {
+                //Delete this curse/bless that has been used
+                this.discard.splice(i, 1);
+                i--;
+            }
+        }
+
+        // This is needed every time we update
+        force_repaint_deck(this);
+    }.bind(deck);
+
+    deck.clean_advantage_deck = function () {
+        if ((deck.advantage_to_clean) && deck.discard[1]) {
+            deck.advantage_to_clean = false;
+            deck.discard[0].ui.removeClass("right");
+            deck.discard[0].ui.removeClass("left");
+            deck.discard[1].ui.removeClass("left");
+            deck.discard[1].ui.removeClass("left");
+        }
+    }.bind(deck);
+    var loaded_deck = JSON.parse(get_from_storage("player5modifier_deck"));
+
+    player5MODIFIER_DECK.forEach(function (card_definition) {
+        var card = define_modifier_card(card_definition);
+        if (loaded_deck && find_in_discard_and_remove(loaded_deck.discard,card.card_type)) {
+            deck.discard.push(card);
+        } else {
+            deck.draw_pile.push(card);
+        }
+    });
+
+    return deck;
+}
+
+function load_player6modifier_deck(number_bless, number_curses) {
+    var deck =
+        {
+            name: "Player 6 modifier deck",
+            type: DECK_TYPES.MODIFIER,
+            draw_pile: [],
+            discard: [],
+            advantage_to_clean: false
+        }
+
+    deck.draw_top_discard = function() {
+        if (this.discard.length > 0) {
+            var card = this.discard[this.discard.length-1];
+            card.ui.set_depth(-3);
+            card.ui.addClass("pull");
+            card.ui.flip_up(true);
+            card.ui.removeClass("draw");
+            card.ui.addClass("discard");
+        }
+        force_repaint_deck(this);
+    }
+
+    deck.count = function (card_type) {
+        return (this.draw_pile.filter(function (card) {
+            return card.card_type === card_type;
+        }).length);
+    }.bind(deck);
+
+    deck.remove_card = function (card_type) {
+        for (var i = 0; i < deck.draw_pile.length; i++) {
+            if (deck.draw_pile[i].card_type == card_type) {
+                deck.draw_pile.splice(i, 1);
+                reshuffle(deck, false);
+
+                force_repaint_deck(deck);
+                break;
+            }
+        }
+        write_to_storage("player6modifier_deck", JSON.stringify(player6modifier_deck));
+
+        return this.count(card_type);
+    }.bind(deck);
+
+    deck.add_card = function (card_type) {
+        // Rulebook p. 23: "a maximum of only 10 curse [and 10 bless] cards can be placed into any one deck"
+        if (this.count(card_type) < 10) {
+            // TOOD: Brittle
+            deck.draw_pile.push(define_modifier_card(MODIFIER_CARDS[card_type.toUpperCase()]));
+
+            force_repaint_deck(deck);
+            reshuffle(deck, false);
+        }
+        write_to_storage("player6modifier_deck", JSON.stringify(player6modifier_deck));
+
+        return this.count(card_type);
+    }.bind(deck);
+
+    deck.shuffle_end_of_round = function () {
+        return this.discard.filter(function (card) {
+                return card.shuffle_next_round;
+            }).length > 0;
+    }.bind(deck);
+
+    deck.must_reshuffle = function () {
+        return !this.draw_pile.length;
+    }.bind(deck);
+
+    deck.clean_discard_pile = function () {
+        for (var i = 0; i < deck.discard.length; i++) {
+            if (this.discard[i].card_type == CARD_TYPES_MODIFIER.BLESS
+                || this.discard[i].card_type == CARD_TYPES_MODIFIER.CURSE) {
+                //Delete this curse/bless that has been used
+                this.discard.splice(i, 1);
+                i--;
+            }
+        }
+
+        // This is needed every time we update
+        force_repaint_deck(this);
+    }.bind(deck);
+
+    deck.clean_advantage_deck = function () {
+        if ((deck.advantage_to_clean) && deck.discard[1]) {
+            deck.advantage_to_clean = false;
+            deck.discard[0].ui.removeClass("right");
+            deck.discard[0].ui.removeClass("left");
+            deck.discard[1].ui.removeClass("left");
+            deck.discard[1].ui.removeClass("left");
+        }
+    }.bind(deck);
+    var loaded_deck = JSON.parse(get_from_storage("player6modifier_deck"));
 
     player4MODIFIER_DECK.forEach(function (card_definition) {
         var card = define_modifier_card(card_definition);
@@ -1178,10 +1388,6 @@ function apply_deck_selection(decks, preserve_existing_deck_state) {
     if (!modifier_deck) {
         init_modifier_deck();
         add_modifier_deck(container, modifier_deck,preserve_existing_deck_state);
-        add_modifier_deck(container, player1modifier_deck,preserve_existing_deck_state);
-        add_modifier_deck(container, player2modifier_deck,preserve_existing_deck_state);
-        add_modifier_deck(container, player3modifier_deck,preserve_existing_deck_state);
-        add_modifier_deck(container, player4modifier_deck,preserve_existing_deck_state);
         if (preserve_existing_deck_state) {
             var loaded_modifier_deck = JSON.parse(get_from_storage("modifier_deck"));
             var curses = count_type("curse", loaded_modifier_deck);
@@ -1269,6 +1475,13 @@ function apply_deck_selection(decks, preserve_existing_deck_state) {
         list_item.appendChild(label);
     });
 
+    add_modifier_deck(container, player1modifier_deck,preserve_existing_deck_state);
+    add_modifier_deck(container, player2modifier_deck,preserve_existing_deck_state);
+    add_modifier_deck(container, player3modifier_deck,preserve_existing_deck_state);
+    add_modifier_deck(container, player4modifier_deck,preserve_existing_deck_state);
+    add_modifier_deck(container, player5modifier_deck,preserve_existing_deck_state);
+    add_modifier_deck(container, player6modifier_deck,preserve_existing_deck_state);
+
     // Rescale card text if necessary
     refresh_ui();
 }
@@ -1279,6 +1492,8 @@ function init_modifier_deck() {
     player2modifier_deck = load_player2modifier_deck(0,0);
     player3modifier_deck = load_player3modifier_deck(0,0);
     player4modifier_deck = load_player4modifier_deck(0,0);
+    player5modifier_deck = load_player5modifier_deck(0,0);
+    player6modifier_deck = load_player6modifier_deck(0,0);
 }
 
 function count_type(type, deck) {
@@ -1380,6 +1595,7 @@ function add_modifier_deck(container, deck, preserve_discards) {
     reshuffle(deck, !preserve_discards);
     deck_space.onclick = draw_modifier_card.bind(null, deck);
 }
+
 
 function LevelSelector(text, inline) {
     var max_level = 7;
