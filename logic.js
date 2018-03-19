@@ -1388,6 +1388,12 @@ function apply_deck_selection(decks, preserve_existing_deck_state) {
     if (!modifier_deck) {
         init_modifier_deck();
         add_modifier_deck(container, modifier_deck,preserve_existing_deck_state);
+        add_modifier_deck(container, player1modifier_deck,preserve_existing_deck_state);
+        add_modifier_deck(container, player2modifier_deck,preserve_existing_deck_state);
+        add_modifier_deck(container, player3modifier_deck,preserve_existing_deck_state);
+        add_modifier_deck(container, player4modifier_deck,preserve_existing_deck_state);
+        add_modifier_deck(container, player5modifier_deck,preserve_existing_deck_state);
+        add_modifier_deck(container, player6modifier_deck,preserve_existing_deck_state);    
         if (preserve_existing_deck_state) {
             var loaded_modifier_deck = JSON.parse(get_from_storage("modifier_deck"));
             var curses = count_type("curse", loaded_modifier_deck);
@@ -1474,13 +1480,6 @@ function apply_deck_selection(decks, preserve_existing_deck_state) {
         }, false)
         list_item.appendChild(label);
     });
-
-    add_modifier_deck(container, player1modifier_deck,preserve_existing_deck_state);
-    add_modifier_deck(container, player2modifier_deck,preserve_existing_deck_state);
-    add_modifier_deck(container, player3modifier_deck,preserve_existing_deck_state);
-    add_modifier_deck(container, player4modifier_deck,preserve_existing_deck_state);
-    add_modifier_deck(container, player5modifier_deck,preserve_existing_deck_state);
-    add_modifier_deck(container, player6modifier_deck,preserve_existing_deck_state);
 
     // Rescale card text if necessary
     refresh_ui();
