@@ -10,6 +10,33 @@ var player5modifier_deck = null;
 var player6modifier_deck = null;
 var deck_definitions = load_definition(DECK_DEFINITONS);
 
+var player_deck = [
+    {
+        deck: player1MODIFIER_DECK,
+        id: "Tod"
+    },
+    {
+        deck: player2MODIFIER_DECK,
+        id: "Zenjo"
+    },
+    {
+        deck: player3MODIFIER_DECK,
+        id: "ruanGod"
+    },
+    {
+        deck: player4MODIFIER_DECK,
+        id: "Chris"
+    },
+    {
+        deck: player5MODIFIER_DECK,
+        id: "Stranger"
+    },
+    {
+        deck: player6MODIFIER_DECK,
+        id: "Miles"
+    },
+]
+
 var DECK_TYPES =
     {
         MODIFIER: "modifier",
@@ -87,20 +114,18 @@ function create_ability_card_front(initiative, name, shuffle, lines, attack, mov
     name_span.innerText = name + "-" + level;
     card.appendChild(name_span);
 
-	
 	var healthNormal_span = document.createElement("span");
     healthNormal_span.className = "healthNormal";
     healthNormal_span.innerText = "HP " + health[0];
     card.appendChild(healthNormal_span);
-	
+
 	if ( health[1] > 0 ) {
 		var healthElite_span = document.createElement("span");
 		healthElite_span.className = "healthElite";
 		healthElite_span.innerText = "HP " + health[1];
-		card.appendChild(healthElite_span);
-	}
-	
-	
+        card.appendChild(healthElite_span);
+    }
+
     var initiative_span = document.createElement("span");
     initiative_span.className = "initiative";
     initiative_span.innerText = initiative;
@@ -494,7 +519,7 @@ function draw_modifier_card(deck) {
                     count: deck.count(deck.discard[0].card_type)
                 }
             }));
-        
+
         if (deck.shuffle_end_of_round())
         {
             document.body.dispatchEvent(new CustomEvent(EVENT_NAMES.MODIFIER_DECK_SHUFFLE_REQUIRED, { detail: { shuffle: true } }));
@@ -546,7 +571,8 @@ function load_modifier_deck(number_bless, number_curses) {
             type: DECK_TYPES.MODIFIER,
             draw_pile: [],
             discard: [],
-            advantage_to_clean: false
+            advantage_to_clean: false,
+            playerId: "Monster"
         }
 
     deck.draw_top_discard = function() {
@@ -650,7 +676,8 @@ function load_player1modifier_deck(number_bless, number_curses) {
             type: DECK_TYPES.MODIFIER,
             draw_pile: [],
             discard: [],
-            advantage_to_clean: false
+            advantage_to_clean: false,
+            playerId: player_deck[0].id
         }
 
     deck.draw_top_discard = function() {
@@ -754,7 +781,8 @@ function load_player2modifier_deck(number_bless, number_curses) {
             type: DECK_TYPES.MODIFIER,
             draw_pile: [],
             discard: [],
-            advantage_to_clean: false
+            advantage_to_clean: false,
+            playerId: player_deck[1].id
         }
 
     deck.draw_top_discard = function() {
@@ -858,7 +886,8 @@ function load_player3modifier_deck(number_bless, number_curses) {
             type: DECK_TYPES.MODIFIER,
             draw_pile: [],
             discard: [],
-            advantage_to_clean: false
+            advantage_to_clean: false,
+            playerId: player_deck[2].id
         }
 
     deck.draw_top_discard = function() {
@@ -962,7 +991,8 @@ function load_player4modifier_deck(number_bless, number_curses) {
             type: DECK_TYPES.MODIFIER,
             draw_pile: [],
             discard: [],
-            advantage_to_clean: false
+            advantage_to_clean: false,
+            playerId: player_deck[3].id
         }
 
     deck.draw_top_discard = function() {
@@ -1066,7 +1096,8 @@ function load_player5modifier_deck(number_bless, number_curses) {
             type: DECK_TYPES.MODIFIER,
             draw_pile: [],
             discard: [],
-            advantage_to_clean: false
+            advantage_to_clean: false,
+            playerId: player_deck[4].id
         }
 
     deck.draw_top_discard = function() {
@@ -1170,7 +1201,8 @@ function load_player6modifier_deck(number_bless, number_curses) {
             type: DECK_TYPES.MODIFIER,
             draw_pile: [],
             discard: [],
-            advantage_to_clean: false
+            advantage_to_clean: false,
+            playerId: player_deck[5].id
         }
 
     deck.draw_top_discard = function() {
@@ -1342,8 +1374,8 @@ function get_monster_stats(name, level) {
 
     var health =        [   MONSTER_STATS["monsters"][name]["level"][level]["normal"]["health"],
                             MONSTER_STATS["monsters"][name]["level"][level]["elite"]["health"]
-                        ];	
-	
+                        ];
+
     return {"attack": attack, "move": move, "range": range, "attributes": attributes, "health": health};
 }
 
@@ -1365,7 +1397,7 @@ function get_boss_stats(name, level) {
         "special1": special1,
         "special2": special2,
         "immunities": immunities,
-        "notes": notes, 
+        "notes": notes,
 		"health":health
     }
 }
@@ -1393,7 +1425,7 @@ function apply_deck_selection(decks, preserve_existing_deck_state) {
         add_modifier_deck(container, player3modifier_deck,preserve_existing_deck_state);
         add_modifier_deck(container, player4modifier_deck,preserve_existing_deck_state);
         add_modifier_deck(container, player5modifier_deck,preserve_existing_deck_state);
-        add_modifier_deck(container, player6modifier_deck,preserve_existing_deck_state);    
+        add_modifier_deck(container, player6modifier_deck,preserve_existing_deck_state);
         if (preserve_existing_deck_state) {
             var loaded_modifier_deck = JSON.parse(get_from_storage("modifier_deck"));
             var curses = count_type("curse", loaded_modifier_deck);
@@ -1424,7 +1456,7 @@ function apply_deck_selection(decks, preserve_existing_deck_state) {
         var deckid = deck.get_real_name().replace(/\s+/g, '');
         var deck_space = document.createElement("div");
         deck_space.id = deckid;
-        deck_space.addEventListener('contextmenu', function(e) {            
+        deck_space.addEventListener('contextmenu', function(e) {
             this.className = "hiddendeck";
             e.preventDefault();
         }, false);
@@ -1465,8 +1497,8 @@ function apply_deck_selection(decks, preserve_existing_deck_state) {
             force_repaint_deck(deck);
         }
         visible_ability_decks.push(deck);
-        
-        var currentdeckslist = document.getElementById("currentdeckslist");        
+
+        var currentdeckslist = document.getElementById("currentdeckslist");
         var list_item = document.createElement("li");
         list_item.className = "currentdeck";
         currentdeckslist.appendChild(list_item);
@@ -1582,6 +1614,10 @@ function add_modifier_deck(container, deck, preserve_discards) {
     draw_two_button.className = "button draw-two";
     draw_two_button.onclick = double_draw.bind(null, modifier_deck);
 
+    var name = document.createElement("div");
+    name.innerText = deck.playerId;
+
+    deck_column.appendChild(name);
     deck_column.appendChild(deck_space);
     deck_column.appendChild(draw_two_button);
 
@@ -1759,6 +1795,55 @@ function ScenarioList(scenarios) {
     return scenariolist;
 }
 
+function getPlayerList(name, modifierDeck) {
+    var playerList = document.createElement("li");
+    playerList.setAttribute("id", name)
+
+    // set player name
+    playerList.appendChild(getPlayerNameElement(name));
+
+    // set card list
+    var cardListWithCount = _(modifierDeck)
+        .compact()
+        .groupBy('type')
+        .map((itmes, type) => ({ type, count: itmes.length }))
+        .value();
+
+    _.forEach(cardListWithCount, (item) => {
+        playerList.appendChild(getCardCount(name, item));
+    });
+
+    return playerList;
+}
+
+function getPlayerNameElement(name) {
+    var nameElem = document.createElement("span");
+    nameElem.innerText = `${name}:`;
+    return nameElem;
+}
+
+function getCardCount(name, item) {
+    var cardCount = document.createElement("div");
+    cardCount.setAttribute("class", "inputBox");
+    cardCount.appendChild(getCardType(item.type));
+    cardCount.appendChild(getCardList(name, item.type, item.count));
+    return cardCount;
+}
+
+function getCardType(type) {
+    var cardType = document.createElement("span");
+    cardType.innerText = type;
+    return cardType;
+}
+
+function getCardList(name, type, count) {
+    var inputElem = document.createElement("input");
+    inputElem.setAttribute("id", `${name}${type}`);
+    inputElem.setAttribute("type", "text");
+    inputElem.setAttribute("value", count)
+    return inputElem;
+}
+
 function init() {
     var deckspage = document.getElementById("deckspage");
     var scenariospage = document.getElementById("scenariospage");
@@ -1766,12 +1851,50 @@ function init() {
     var applyscenariobtn = document.getElementById("applyscenario");
     var applyloadbtn = document.getElementById("applyload");
     var showmodifierdeck = document.getElementById("showmodifierdeck");
+    var playerDeckContainer = document.getElementById("playerDeckContainer");
+    var savedeckbtn = document.getElementById("save");
 
     var decklist = new DeckList();
     var scenariolist = new ScenarioList(SCENARIO_DEFINITIONS);
 
+
+    _.forEach(player_deck, (item) => {
+        var playerlist = getPlayerList(item.id, item.deck);
+        playerDeckContainer.appendChild(playerlist);
+    });
+
     deckspage.insertAdjacentElement("afterbegin", decklist.ul);
     scenariospage.insertAdjacentElement("afterbegin", scenariolist.ul);
+
+    // console.log(MODIFIER_CARDS.PLUS0);
+
+    savedeckbtn.onclick = function () {
+        _.forEach(player_deck, (item) => {
+            var newDeck = [];
+            _.forEach(CARD_TYPES_MODIFIER, (type) => {
+                var cardCount = document.getElementById(`${item.id}${type}`);
+                if(cardCount != null) {
+                    for(var i=1; i<=cardCount.value; i++) {
+                        if(type === "plus0") newDeck.push(MODIFIER_CARDS.PLUS0);
+                        if(type === "plus1") newDeck.push(MODIFIER_CARDS.PLUS1);
+                        if(type === "plus2") newDeck.push(MODIFIER_CARDS.PLUS2);
+                        if(type === "minus1") newDeck.push(MODIFIER_CARDS.MINUS1);
+                        if(type === "minus2") newDeck.push(MODIFIER_CARDS.MINUS2);
+                        if(type === "null") newDeck.push(MODIFIER_CARDS.NULL);
+                        if(type === "double") newDeck.push(MODIFIER_CARDS.DOUBLE);
+                    }
+                }
+            });
+            item.deck = newDeck;
+        });
+
+        player1MODIFIER_DECK = player_deck[0].deck;
+        player2MODIFIER_DECK = player_deck[1].deck;
+        player3MODIFIER_DECK = player_deck[2].deck;
+        player4MODIFIER_DECK = player_deck[3].deck;
+        player5MODIFIER_DECK = player_deck[4].deck;
+        player6MODIFIER_DECK = player_deck[5].deck;
+    }
 
     applydeckbtn.onclick = function () {
         localStorage.clear();
